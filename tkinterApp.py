@@ -3,6 +3,7 @@ import tkinter as tk
 import subprocess
 
 browsers = ["Google.Chrome", "Mozilla.Firefox", "Brave.Brave", "Opera.Opera", "Microsoft.Edge"]
+Success = False
 
 root = tk.Tk()
 root.title("Installer")
@@ -26,20 +27,26 @@ def goodPopup():
     okButton = tk.Button(popup, text="OK", command=sys.exit)
     okButton.pack()
 
+def localisedVersions(): # TODO add option to select language
+    return
+
 def download():
     for i in browserListbox.curselection():
         Selection = browsers[i]
         InstallingLabel = tk.Label(root, text="Installing... Please wait.") # TODO make this a popup
         InstallingLabel.pack()
-        try: 
+        try: # TODO potentially change to use list of selected items i.e ...install Brave.Brave, Google.Chrome ...
             subprocess.run("winget install " + Selection + " --silent --accept-package-agreements --accept-source-agreements", check=True)
         except:
             badPopup()
             InstallingLabel.destroy()
+            success = False
             return
         else:
-            goodPopup() #TODO make this only show after all selected browsers are installed
+            success = True
             InstallingLabel.destroy()
+    if success:
+        goodPopup()
 
 browserListbox = tk.Listbox(root, selectmode=tk.MULTIPLE)
 
@@ -49,9 +56,6 @@ browserListbox.pack(pady=20)
 
 button = tk.Button(root, text="Download", command=download)
 button.pack(pady=20)
-
-button2 = tk.Button(root, text="test", command=lambda: print(browserListbox.curselection())) #TODO remove
-button2.pack(pady=20)
 
 #TODO add an option to only download without installing
 
