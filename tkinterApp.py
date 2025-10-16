@@ -2,10 +2,11 @@ import sys
 import tkinter as tk
 import subprocess
 
+browsers = ["Google.Chrome", "Mozilla.Firefox", "Brave.Brave", "Opera.Opera", "Microsoft.Edge"]
+
 root = tk.Tk()
 root.title("Installer")
-root.focus_force()
-root.minsize(300, 200)
+root.minsize(600, 400)
 
 def badPopup():
     popup = tk.Tk()
@@ -22,24 +23,36 @@ def goodPopup():
     popup.wm_title("!")
     popup.minsize(200, 100)
     tk.Message(popup, text="Installation successful!").pack()
-    okButton = tk.Button(popup, text="OK", command=popup.destroy)
+    okButton = tk.Button(popup, text="OK", command=sys.exit)
     okButton.pack()
 
 def download():
-    InstallingLabel = tk.Label(root, text="Installing... Please wait.")
-    InstallingLabel.pack()
-    root.update()
-    try: subprocess.run("winget install Brave.Brave --silent --accept-package-agreements --accept-source-agreements", check=True)
-    except:
-        badPopup()
-        InstallingLabel.destroy()
-        return
-    else:
-        goodPopup()
-        InstallingLabel.destroy()
-        root.destroy()
+    for i in browserListbox.curselection():
+        Selection = browsers[i]
+        InstallingLabel = tk.Label(root, text="Installing... Please wait.") # TODO make this a popup
+        InstallingLabel.pack()
+        try: 
+            subprocess.run("winget install " + Selection + " --silent --accept-package-agreements --accept-source-agreements", check=True)
+        except:
+            badPopup()
+            InstallingLabel.destroy()
+            return
+        else:
+            goodPopup() #TODO make this only show after all selected browsers are installed
+            InstallingLabel.destroy()
+
+browserListbox = tk.Listbox(root, selectmode=tk.MULTIPLE)
+
+for browser in browsers:
+    browserListbox.insert(tk.END, browser)
+browserListbox.pack(pady=20)
 
 button = tk.Button(root, text="Download", command=download)
 button.pack(pady=20)
+
+button2 = tk.Button(root, text="test", command=lambda: print(browserListbox.curselection())) #TODO remove
+button2.pack(pady=20)
+
+#TODO add an option to only download without installing
 
 root.mainloop()
